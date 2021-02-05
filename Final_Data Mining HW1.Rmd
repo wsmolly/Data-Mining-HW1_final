@@ -1,0 +1,335 @@
+---
+title: "Data Mining HW1"
+author: "Wen-Hsin Chang"
+date: "2021/1/29"
+output: github_document
+keep_md: true
+---
+
+```{r setup, , echo=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+```{r Gasprices , echo=FALSE, message = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(mosaic)
+library(dbplyr)
+
+ GasPrices <- read.csv("C:/Users/user/Desktop/Austin course/Data Mining/GasPrices.csv")
+
+```
+
+## Q1 Data visualization:gas prices
+#The theories
+
+A.) Gas stations charge more if they lack direct competition in sight (boxplot).
+
+```{r, echo=FALSE}
+ggplot(GasPrices)+geom_boxplot(mapping=aes(x=Competitors,y=Price),fill='#A4A4A4', color="darkred")
+```
+
+The theory seems to be unsupported by the data. Specifically, the box plot shows that gas station without competitors sets higher price.
+
+
+B.) The richer the area, the higher the gas price (scatter plot).
+
+```{r, echo=FALSE}
+ggplot(data=GasPrices)+geom_point(mapping=aes(x=Income,y=Price),color='darkblue')
+```
+
+The theory seems to be supported by the data. Specifically, the scatter plot shows that richer areas has higher price.
+
+
+C.) Shell charges more than other brands (bar plot).
+
+```{r, echo=FALSE , message = FALSE}
+GasPrices=GasPrices%>%mutate(Shell=ifelse(Name=='Shell','Y','N'))
+d1=GasPrices%>%group_by(Shell)%>%summarize(Avg.Price=sum(Price)/n())
+ggplot(data=d1)+geom_bar(mapping=aes(x=Shell,y=Avg.Price),stat='identity')
+```
+
+The theory seems to be supported by the data, but to a lesser degree. Specifically, the bar plot shows that Shell charges slightly more than other brands.
+
+
+D.) Gas stations at stoplights charge more (faceted histogram).
+
+```{r, echo=FALSE , message = FALSE}
+ggplot(data=GasPrices)+geom_histogram(mapping=aes(x=Price),binwidth=0.05,fill="darkblue")+facet_wrap(~Stoplight)
+```
+
+The theory seems to be supported by the data. Specifically, the faceted histogram shows that Gas stations at stoplights charge more. We can use the skewness of the distribution to help our assessment.
+
+E.) Gas stations with direct highway access charge more (your choice of plot).
+
+```{r , echo=FALSE , message = FALSE}
+ggplot(GasPrices)+geom_boxplot(mapping=aes(x=Highway,y=Price),fill='#A4A4A4', color="darkred")
+```
+
+The theory seems to be supported by the data. Specifically, the box plot shows that Gas stations with direct highway access charge more.
+
+
+## Q2 Data visualization:a bike share network
+
+```{r , echo=FALSE , message = FALSE}
+library (readr)
+
+urlfile="https://raw.githubusercontent.com/jgscott/ECO395M/master/data/bikeshare.csv"
+
+bikeshare<-read_csv(url(urlfile))
+```
+
+A.)Plot A: a line graph showing average bike rentals (Avg.Rentals) versus hour of the day (hr).
+
+```{r, echo=FALSE , message = FALSE}
+
+d3=bikeshare%>%group_by(hr)%>%summarize(Avg.Rentals=sum(total)/n())
+ggplot(data=d3)+geom_line(mapping=aes(x=hr,y=Avg.Rentals),color="blue")+labs(caption="Plot A: Average bike rentals versus hour of the day.
+Take-home lesson: The average rental spikes at around 8 am and 5pm maybe because people need to commute.
+")
+```
+
+The average rental spikes at around 8 am and 5pm, which makes intuitive sense because people may commute by rental bike to avoid traffic jams.
+
+
+B.) Plot B:a faceted line graph showing average bike rentals versus hour of the day, faceted according to whether it is a working day
+
+```{r, echo=FALSE , message = FALSE}
+bikeshare=bikeshare%>%mutate(workingdays=ifelse(workingday==1,'Working day:Yes','Working day:No'))
+d4=bikeshare%>%group_by(workingdays,hr)%>%summarize(Avg.Rentals=sum(total)/n())
+ggplot(data=d4)+geom_line(mapping=aes(x=hr,y=Avg.Rentals),color="blue")+facet_wrap(~workingdays)+labs(caption="Plot B: Average bike rentals versus hour of the day, faceted according to whether it is a working day.
+                                                                                                      Take-home lesson: During working day (weekend),bike rental spikes at 8 am and 5 pm (afternoon).")
+                                                                                                      
+```
+
+On a typical working day, bike rental spikes at around 8 am and 5 pm but on a typical weekend, bike rental spikes in the afternoon. 
+
+
+c.)Plot C: a faceted bar plot showing average ridership during the 8 AM hour by weather situation code (weathersit), faceted according to whether it is a working day or not
+
+```{r, echo=FALSE , message = FALSE}
+bikeshare=bikeshare%>%filter(hr==8)
+d5=bikeshare%>%group_by(workingdays,weathersit)%>%summarize(Avg.Rentals=sum(total)/n())
+ggplot(data=d5)+geom_bar(mapping=aes(x=weathersit,y=Avg.Rentals),stat="identity",fill="darkblue")+facet_wrap(~workingdays)+labs(caption="Plot C: Average bike rentals during 8AM by weather situation, faceted according to whether it is a working day
+                                                                                                        Take-home lesson: Bike rental spikes (plunges) when the weather is good (bad). This holds for all days
+")
+```
+
+Bike rental spikes (vs plunges) when the weather is good (vs bad). The theory holds for both working day and weekend.
+
+
+## Q3 Data visualization:Flights at ABIA
+
+A.) What is the best time of day to fly to minimize delays (I do not care about arriving early) ? Does this change by airline?
+
+```{r,echo=FALSE , message = FALSE}
+library (readr)
+
+urlfile="https://raw.githubusercontent.com/jgscott/ECO395M/master/data/ABIA.csv"
+
+Flights<-read_csv(url(urlfile))
+
+```
+
+```{r,echo=FALSE , message = FALSE}
+Flights=Flights%>%mutate(time=case_when(0< CRSDepTime & CRSDepTime< 600 ~'00-06',599<CRSDepTime & CRSDepTime<1200 ~'06-12',1199<CRSDepTime & CRSDepTime<1800 ~'12-18', TRUE ~'18-24'))
+d6=Flights%>%filter(ArrDelay>0)
+d7=d6%>%group_by(time)%>%summarize(Avg.Delay=sum(ArrDelay)/n())
+ggplot(data=d7)+geom_col(mapping=aes(x=time,y=Avg.Delay),fill="darkblue")
+
+```
+
+Based on the result above, on average, 18-24 pm is more likely to encounter arrival delay (worst time to fly), and 0-6 am is less likely to encounter arrival delay (best time to fly).
+
+
+```{r,echo=FALSE , message = FALSE}
+d6=Flights%>%filter( ArrDelay> 0)
+d8=d6%>%filter(UniqueCarrier=='AA'|UniqueCarrier=='9E'|UniqueCarrier=='DL'|UniqueCarrier=='UA')
+d8=d8%>%group_by(time,UniqueCarrier)%>%summarize(Avg.Delay=sum(ArrDelay)/n())
+ggplot(data=d8)+geom_col(mapping=aes(x=time,y=Avg.Delay),fill="darkred")+facet_wrap(~UniqueCarrier)
+```
+
+Although 18-24 pm is more likely to encounter arrival delay, the result changes by airline. For instance, airline"9E" is more likely to delay at 0-6 am, and airline "UA" is more likely to delay at 12-18 pm.
+
+
+B.)What is the best time of year to fly to minimize delays? Does this change by destination?
+
+```{r,echo=FALSE , message = FALSE}
+d8=Flights%>%filter( ArrDelay> 0)
+d8=d8%>%filter(Dest=='AUS'|Dest=='SFO'|Dest=='EWR'|Dest=='LAX'|Dest=='PHX'|Dest=='SAN')
+d8=d8%>%group_by(Dest,Month)%>%summarize(Avg.Delay=sum(ArrDelay)/n())
+ggplot(data=d8)+geom_line(mapping=aes(x=Month,y=Avg.Delay,color=Dest))+theme_bw(base_size=18)+scale_x_continuous(breaks=1:12)
+```
+
+Based on the result above, the best time of the year to fly seems to be May and the worst time to fly seems to be December, but the result varies by destination.
+
+
+```{r,echo=FALSE , message = FALSE}
+ggplot(data=d8)+geom_line(mapping=aes(x=Month,y=Avg.Delay),color="darkred")+scale_x_continuous(breaks=1:12)+facet_wrap(~Dest)
+```
+
+For instance, the best time to fly to "AUS" airport seems to be October, and the best time to fly to "EWR" seems to be January.
+
+
+C.)What are the bad airports to fly?
+
+```{r,echo=FALSE , message = FALSE}
+d10=Flights%>%filter( ArrDelay> 0)
+d10=d10%>%filter(Origin=='AUS'|Origin=='SFO'|Origin=='LAX'|Origin=='SAN'|Origin=='EWR'|Origin=='PHX')
+d10=d10%>%group_by(Origin)%>%summarize(Avg.Delay=sum(ArrDelay)/n())
+ggplot(data=d10)+geom_col(mapping=aes(x=Origin,y=Avg.Delay),fill="darkblue")
+```
+
+I focus on some of the most popular airport and find that, based on the result above, "EWR" and "SFO" are two of the airports that delay the most. The result makes intuitive sense since New York and San Francisco are two of the most popular destinations in the US.
+
+
+## Q4 K-nearest neighbots
+
+```{r,echo=FALSE , message = FALSE}
+library (readr)
+library(rsample)  # for creating train/test splits
+library(caret)
+library(modelr)
+library(installr)
+library(foreach)
+
+urlfile="https://raw.githubusercontent.com/jgscott/ECO395M/master/data/sclass.csv"
+
+sclass<-read_csv(url(urlfile))
+
+```
+
+#Trim Level filter:350
+```{r , message = FALSE}
+trim_350=sclass%>%filter(trim==350)
+```
+
+#train/test split (0.1/0.9)
+```{r,message = FALSE}
+# Make a train-test split
+trim_350_split =  initial_split(trim_350, prop=0.9)
+trim_350_train = training(trim_350_split)
+trim_350_test  = testing(trim_350_split)
+```
+
+KNN with K = 2
+```{r, message = FALSE}
+# KNN with K = 2
+knn2 = knnreg(price ~ mileage, data=trim_350_train , k=2)
+rmse(knn2, trim_350_test)
+
+```
+KNN with K = 5
+```{r, message = FALSE}
+# KNN with K =5
+knn5 = knnreg(price ~ mileage, data=trim_350_train , k=5)
+rmse(knn5, trim_350_test)
+
+```
+KNN with K = 10
+```{r}
+# KNN with K =10
+knn10 = knnreg(price ~ mileage, data=trim_350_train , k=10)
+rmse(knn10, trim_350_test)
+
+```
+
+#RMSE versus K
+
+```{r,echo=FALSE , message = FALSE, warning=FALSE}
+y <- data.frame(K=rep(NA, 1),RMSE_out = rep(NA, 1))
+k_grid = unique(round(exp(seq(log(150), log(2), length=10))))
+
+for(n in 1:375) {
+knn_model = knnreg(price ~ mileage, data=trim_350_train ,k= n)
+y[n,2]=rmse(knn_model, trim_350_test)
+y[n,1]=n
+ }
+ggplot(data=y)+geom_line(mapping=aes(x=K,y=RMSE_out),color="red") + xlim(0, 375)+ ylim(7000, 25000)
+
+```
+
+#Optimal at K=17...
+
+```{r,echo=FALSE , message = FALSE}
+knn8 = knnreg(price ~ mileage, data=trim_350_train , k=17)
+
+# attach the predictions to the test data frame
+
+trim_350_test = trim_350_test %>%
+  mutate(trim_350_pred = predict(knn8,trim_350_test))
+
+p_test = ggplot(data = trim_350_test) + 
+  geom_point(mapping = aes(x =mileage, y = price), color='black', alpha=0.2)
+# now add the predictions
+p_test + geom_line(aes(x =mileage, y = trim_350_pred), color='blue',size=1)
+```
+
+
+#Trim Level filter:65AMG
+```{r , message = FALSE}
+trim_65AMG=sclass%>%filter(trim=='65 AMG')
+```
+
+#train/test split (0.1/0.9)
+
+```{r,message = FALSE}
+# Make a train-test split
+trim_65AMG_split =  initial_split(trim_65AMG, prop=0.9)
+trim_65AMG_train = training(trim_65AMG_split)
+trim_65AMG_test  = testing(trim_65AMG_split)
+```
+
+KNN with K = 2
+```{r, message = FALSE}
+# KNN with K = 2
+knn2 = knnreg(price ~ mileage, data=trim_65AMG_train , k=2)
+rmse(knn2, trim_65AMG_test)
+```
+KNN with K = 5
+```{r,message = FALSE}
+# KNN with K = 5
+knn5 = knnreg(price ~ mileage, data=trim_65AMG_train , k=5)
+rmse(knn5, trim_65AMG_test)
+```
+KNN with K = 10
+```{r,message = FALSE}
+# KNN with K =10
+knn10 = knnreg(price ~ mileage, data=trim_65AMG_train , k=10)
+rmse(knn10, trim_65AMG_test)
+```
+
+
+#RMSE versus K
+
+```{r,echo=FALSE , message = FALSE,warning=FALSE}
+y <- data.frame(K=rep(NA, 1),RMSE_out = rep(NA, 1))
+k_grid = unique(round(exp(seq(log(150), log(2), length=10))))
+
+for(n in 1:263) {
+knn_model = knnreg(price ~ mileage, data=trim_65AMG_train ,k= n)
+y[n,2]=rmse(knn_model, trim_65AMG_test)
+y[n,1]=n
+ }
+ggplot(data=y)+geom_line(mapping=aes(x=K,y=RMSE_out),color="red") + xlim(0, 263)+ ylim(10000, 85000)
+
+```
+\newpage
+#Optimal at K=6
+
+```{r,echo=FALSE , message = FALSE}
+knn8 = knnreg(price ~ mileage, data=trim_65AMG_train , k=6)
+
+# attach the predictions to the test data frame
+
+trim_65AMG_test = trim_65AMG_test %>%
+  mutate(trim_65AMG_pred = predict(knn8,trim_65AMG_test))
+
+p_test = ggplot(data = trim_65AMG_test) + 
+  geom_point(mapping = aes(x =mileage, y = price), color='black', alpha=0.2)
+# now add the predictions
+p_test + geom_line(aes(x =mileage, y = trim_65AMG_pred), color='blue',size=1)
+
+```
+
+According to my train-test split(0.1/0/9) 350 yield slightly greater value of K, but since the sample is not very big, it depends on the random process that R assign the train/test split. I think the reason that two trim has different values of K is mainly because 65 AMG has smaller data size, and its mileage information varies less.
+
