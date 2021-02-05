@@ -64,7 +64,7 @@ of the day, faceted according to whether it is a working day
 On a typical working day, bike rental spikes at around 8 am and 5 pm but
 on a typical weekend, bike rental spikes in the afternoon.
 
-c.)Plot C: a faceted bar plot showing average ridership during the 8 AM
+C.)Plot C: a faceted bar plot showing average ridership during the 8 AM
 hour by weather situation code (weathersit), faceted according to
 whether it is a working day or not
 
@@ -117,19 +117,48 @@ are two of the most popular destinations in the US.
 
 \#Trim Level filter:350
 
+``` r
+trim_350=sclass%>%filter(trim==350)
+```
+
 \#train/test split (0.1/0.9)
+
+``` r
+# Make a train-test split
+trim_350_split =  initial_split(trim_350, prop=0.9)
+trim_350_train = training(trim_350_split)
+trim_350_test  = testing(trim_350_split)
+```
 
 KNN with K = 2
 
-    ## [1] 13144.98
+``` r
+# KNN with K = 2
+knn2 = knnreg(price ~ mileage, data=trim_350_train , k=2)
+rmse(knn2, trim_350_test)
+```
+
+    ## [1] 11291.73
 
 KNN with K = 5
 
-    ## [1] 12401.52
+``` r
+# KNN with K =5
+knn5 = knnreg(price ~ mileage, data=trim_350_train , k=5)
+rmse(knn5, trim_350_test)
+```
+
+    ## [1] 10291.51
 
 KNN with K = 10
 
-    ## [1] 12410.25
+``` r
+# KNN with K =10
+knn10 = knnreg(price ~ mileage, data=trim_350_train , k=10)
+rmse(knn10, trim_350_test)
+```
+
+    ## [1] 9882.744
 
 \#RMSE versus K
 
@@ -141,29 +170,59 @@ KNN with K = 10
 
 \#Trim Level filter:65AMG
 
+``` r
+trim_65AMG=sclass%>%filter(trim=='65 AMG')
+```
+
 \#train/test split (0.1/0.9)
+
+``` r
+# Make a train-test split
+trim_65AMG_split =  initial_split(trim_65AMG, prop=0.9)
+trim_65AMG_train = training(trim_65AMG_split)
+trim_65AMG_test  = testing(trim_65AMG_split)
+```
 
 KNN with K = 2
 
-    ## [1] 22415.92
+``` r
+# KNN with K = 2
+knn2 = knnreg(price ~ mileage, data=trim_65AMG_train , k=2)
+rmse(knn2, trim_65AMG_test)
+```
+
+    ## [1] 23727.33
 
 KNN with K = 5
 
-    ## [1] 20031.93
+``` r
+# KNN with K = 5
+knn5 = knnreg(price ~ mileage, data=trim_65AMG_train , k=5)
+rmse(knn5, trim_65AMG_test)
+```
+
+    ## [1] 23822.37
 
 KNN with K = 10
 
-    ## [1] 17720.97
+``` r
+# KNN with K =10
+knn10 = knnreg(price ~ mileage, data=trim_65AMG_train , k=10)
+rmse(knn10, trim_65AMG_test)
+```
+
+    ## [1] 22476.66
 
 \#RMSE versus K
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
- \#Optimal at K=6
+
+\#Optimal at K=70
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
-According to my train-test split(0.1/0/9) 350 yield slightly greater
-value of K, but since the sample is not very big, it depends on the
-random process that R assign the train/test split. I think the reason
-that two trim has different values of K is mainly because 65 AMG has
-smaller data size, and its mileage information varies less.
+According to my train-test split(0.1/0/9) 63AMG yield greater value of
+K, but since the sample is not very big, it depends on the random
+process that R assign the train/test split. I think the reason that two
+trim has different values of K is mainly because 65 AMG has smaller data
+size, and its mileage information varies less.
