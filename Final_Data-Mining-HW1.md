@@ -138,7 +138,7 @@ knn2 = knnreg(price ~ mileage, data=trim_350_train , k=2)
 rmse(knn2, trim_350_test)
 ```
 
-    ## [1] 11291.73
+    ## [1] 12323.95
 
 KNN with K = 5
 
@@ -148,7 +148,7 @@ knn5 = knnreg(price ~ mileage, data=trim_350_train , k=5)
 rmse(knn5, trim_350_test)
 ```
 
-    ## [1] 10291.51
+    ## [1] 10263.44
 
 KNN with K = 10
 
@@ -158,7 +158,7 @@ knn10 = knnreg(price ~ mileage, data=trim_350_train , k=10)
 rmse(knn10, trim_350_test)
 ```
 
-    ## [1] 9882.744
+    ## [1] 10247.21
 
 \#RMSE versus K
 
@@ -191,7 +191,7 @@ knn2 = knnreg(price ~ mileage, data=trim_65AMG_train , k=2)
 rmse(knn2, trim_65AMG_test)
 ```
 
-    ## [1] 23727.33
+    ## [1] 24767.76
 
 KNN with K = 5
 
@@ -201,7 +201,7 @@ knn5 = knnreg(price ~ mileage, data=trim_65AMG_train , k=5)
 rmse(knn5, trim_65AMG_test)
 ```
 
-    ## [1] 23822.37
+    ## [1] 20873.88
 
 KNN with K = 10
 
@@ -211,7 +211,7 @@ knn10 = knnreg(price ~ mileage, data=trim_65AMG_train , k=10)
 rmse(knn10, trim_65AMG_test)
 ```
 
-    ## [1] 22476.66
+    ## [1] 20147
 
 \#RMSE versus K
 
@@ -221,7 +221,7 @@ rmse(knn10, trim_65AMG_test)
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
-According to my train-test split(0.1/0/9) 63AMG yield greater value of
+According to my train-test split(0.1/0/9) 65 AMG yield greater value of
 K, but since the sample is not very big, it depends on the random
 process that R assign the train/test split. I think the reason that two
 trim has different values of K is mainly because 65 AMG has smaller data

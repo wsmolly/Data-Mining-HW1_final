@@ -331,5 +331,5 @@ p_test + geom_line(aes(x =mileage, y = trim_65AMG_pred), color='blue',size=1)
 
 ```
 
-According to my train-test split(0.1/0/9) 63AMG yield greater value of K, but since the sample is not very big, it depends on the random process that R assign the train/test split. I think the reason that two trim has different values of K is mainly because 65 AMG has smaller data size, and its mileage information varies less.
+According to my train-test split(0.1/0/9) 65 AMG yield greater value of K, but since the sample is not very big, it depends on the random process that R assign the train/test split. I think the reason that two trim has different values of K is mainly because 65 AMG has smaller data size, and its mileage information varies less.
 
