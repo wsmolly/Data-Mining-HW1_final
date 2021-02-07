@@ -244,14 +244,14 @@ knn_model = knnreg(price ~ mileage, data=trim_350_train ,k= n)
 y[n,2]=rmse(knn_model, trim_350_test)
 y[n,1]=n
  }
-ggplot(data=y)+geom_line(mapping=aes(x=K,y=RMSE_out),color="red") + xlim(0, 375)+ ylim(7000, 25000)
+ggplot(data=y)+geom_line(mapping=aes(x=K,y=RMSE_out),color="red") + xlim(0, 375)+ ylim(5000, 25000)
 
 ```
 
-#Optimal at K=17...
+#Optimal at K=14...
 
 ```{r,echo=FALSE , message = FALSE}
-knn8 = knnreg(price ~ mileage, data=trim_350_train , k=17)
+knn8 = knnreg(price ~ mileage, data=trim_350_train , k=14)
 
 # attach the predictions to the test data frame
 
@@ -314,10 +314,10 @@ ggplot(data=y)+geom_line(mapping=aes(x=K,y=RMSE_out),color="red") + xlim(0, 263)
 
 ```
 
-#Optimal at K=70
+#Optimal at K=6
 
 ```{r,echo=FALSE , message = FALSE}
-knn8 = knnreg(price ~ mileage, data=trim_65AMG_train , k=70)
+knn8 = knnreg(price ~ mileage, data=trim_65AMG_train , k=6)
 
 # attach the predictions to the test data frame
 
@@ -331,5 +331,5 @@ p_test + geom_line(aes(x =mileage, y = trim_65AMG_pred), color='blue',size=1)
 
 ```
 
-According to my train-test split(0.9/0.1) 65 AMG yield greater value of K, but since the sample is not very big, it depends on the random process that R assign the train/test split. I think the reason that two trim has different values of K is mainly because 65 AMG has smaller data size, and its mileage information varies less.
+According to my train-test split(0.9/0.1), 350 yields a greater value of K.However,since the sample is not very big, it depends heavily on the random process that R assigns the train/test split. I think the reason that two trims have different values of K is mainly because 65 AMG has a smaller data size, and its mileage information varies less.
 

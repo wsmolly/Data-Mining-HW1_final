@@ -138,7 +138,7 @@ knn2 = knnreg(price ~ mileage, data=trim_350_train , k=2)
 rmse(knn2, trim_350_test)
 ```
 
-    ## [1] 14675.72
+    ## [1] 14694.68
 
 KNN with K = 5
 
@@ -148,7 +148,7 @@ knn5 = knnreg(price ~ mileage, data=trim_350_train , k=5)
 rmse(knn5, trim_350_test)
 ```
 
-    ## [1] 13713
+    ## [1] 14010.1
 
 KNN with K = 10
 
@@ -158,13 +158,13 @@ knn10 = knnreg(price ~ mileage, data=trim_350_train , k=10)
 rmse(knn10, trim_350_test)
 ```
 
-    ## [1] 13752.62
+    ## [1] 11971.27
 
 \#RMSE versus K
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
-\#Optimal at K=17…
+\#Optimal at K=14…
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
@@ -191,7 +191,7 @@ knn2 = knnreg(price ~ mileage, data=trim_65AMG_train , k=2)
 rmse(knn2, trim_65AMG_test)
 ```
 
-    ## [1] 25228.86
+    ## [1] 18406.93
 
 KNN with K = 5
 
@@ -201,7 +201,7 @@ knn5 = knnreg(price ~ mileage, data=trim_65AMG_train , k=5)
 rmse(knn5, trim_65AMG_test)
 ```
 
-    ## [1] 22109.78
+    ## [1] 14269.27
 
 KNN with K = 10
 
@@ -211,18 +211,18 @@ knn10 = knnreg(price ~ mileage, data=trim_65AMG_train , k=10)
 rmse(knn10, trim_65AMG_test)
 ```
 
-    ## [1] 20279.01
+    ## [1] 11675.81
 
 \#RMSE versus K
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
-\#Optimal at K=70
+\#Optimal at K=6
 
 ![](Final_Data-Mining-HW1_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
-According to my train-test split(0.9/0.1) 65 AMG yield greater value of
-K, but since the sample is not very big, it depends on the random
-process that R assign the train/test split. I think the reason that two
-trim has different values of K is mainly because 65 AMG has smaller data
-size, and its mileage information varies less.
+According to my train-test split(0.9/0.1), 350 yields a greater value of
+K.However,since the sample is not very big, it depends heavily on the
+random process that R assigns the train/test split. I think the reason
+that two trims have different values of K is mainly because 65 AMG has a
+smaller data size, and its mileage information varies less.
